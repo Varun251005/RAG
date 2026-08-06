@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     upload_dir: str = "uploads"
     max_upload_size_mb: int = 25
 
+    # ── Chunking ──────────────────────────────────────────────────────────────
+    chunk_size: int = 1000
+    chunk_overlap: int = 200
+
     # ── CORS ──────────────────────────────────────────────────────────────────
     allowed_origins: list[str] = ["http://localhost:3000"]
 

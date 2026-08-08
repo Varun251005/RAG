@@ -27,7 +27,9 @@ from app.api.deps import (
     get_rag_service,
     get_vector_store_service,
 )
+from app.models.ai_features import AIFeatureRequest
 from app.models.rag import RAGQuery, RAGResponse
+
 from app.services.document_service import DocumentService
 from app.services.embedding_service import EmbeddingService
 from app.services.rag_service import RAGService
@@ -206,3 +208,63 @@ async def ingest_document(
         f"collection={result.collection}"
     )
     return result
+
+
+@router.post(
+    "/reindex/{doc_id}",
+    response_model=UpsertResult,
+    summary="Re-index and update embeddings for a document",
+    description=(
+        "Purges existing chunks for doc_id from ChromaDB and re-runs the "
+        "chunking + embedding pipeline to update vector store embeddings."
+    ),
+    tags=["RAG"],
+)
+async def reindex_document(
+    doc_id: str = Path(description="UUID of the document to re-index."),
+    collection: str | None = None,
+    doc_service: DocumentService = Depends(get_document_service),
+    embedding_service: EmbeddingService = Depends(get_embedding_service),
+    vector_store: VectorStoreService = Depends(get_vector_store_service),
+) -> UpsertResult:
+    logger.info(f"Re-index requested for document | doc_id={doc_id}")
+
+    # 1. Purge existing vectors for doc_id if present
+    try:
+        await vector_store.delete_document(doc_id, collection_name=collection)
+        logger.info(f"Purged old embeddings for re-indexing | doc_id={doc_id}")
+    except Exception as exc:
+        logger.debug(f"Purge before re-index skipped | doc_id={doc_id} | {exc}")
+
+    # 2. Run fresh ingestion
+    return await ingest_document(
+        doc_id=doc_id,
+        collection=collection,
+        doc_service=doc_service,
+        embedding_service=embedding_service,
+        vector_store=vector_store,
+    )
+
+
+@router.post(
+    "/ai-features",
+    response_model=RAGResponse,
+    summary="Generate AI Document Features (Summary, Flashcards, Quiz, Notes, Key Topics, FAQ)",
+    description=(
+        "Uses the RAG retrieval and Gemini LLM pipeline to generate structured AI "
+        "features for a document or collection."
+    ),
+    tags=["RAG"],
+)
+async def generate_ai_feature_endpoint(
+    req: AIFeatureRequest,
+    service: RAGService = Depends(get_rag_service),
+) -> RAGResponse:
+    logger.info(f"AI Feature requested: {req.feature.value} | doc_id={req.document_id}")
+    return await service.generate_ai_feature(
+        feature=req.feature.value,
+        document_id=req.document_id,
+        collection=req.collection,
+    )
+
+

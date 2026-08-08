@@ -1,3 +1,5 @@
+"""Health check route — GET /api/v1/health."""
+
 from fastapi import APIRouter
 from loguru import logger
 
@@ -11,17 +13,29 @@ async def _check_dependencies() -> dict[str, HealthStatus]:
     """
     Probe each external dependency.
 
-    Returns a dict keyed by dependency name.
-    Designed to be extended as DB, ChromaDB, and Gemini are integrated.
+    ChromaDB: attempts a real heartbeat via the singleton VectorStoreService.
+    PostgreSQL: placeholder until the DB layer is added.
     """
     results: dict[str, HealthStatus] = {}
 
     # ── PostgreSQL ─────────────────────────────────────────────────────────
-    # Placeholder: will perform an actual async ping in Phase 02.
+    # Placeholder: will perform an actual async ping when the DB layer lands.
     results["postgres"] = HealthStatus(status="not_configured", detail="Phase 02")
 
     # ── ChromaDB ───────────────────────────────────────────────────────────
-    results["chromadb"] = HealthStatus(status="not_configured", detail="Phase 03")
+    try:
+        from app.api.deps import get_vector_store_service
+
+        svc = get_vector_store_service()
+        client = await svc._get_client()  # noqa: SLF001
+        # list_collections is the lightest call that confirms the server is up.
+        await client.list_collections()
+        results["chromadb"] = HealthStatus(status="ok")
+    except Exception as exc:  # noqa: BLE001
+        results["chromadb"] = HealthStatus(
+            status="unreachable",
+            detail=str(exc)[:120],
+        )
 
     return results
 

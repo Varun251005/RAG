@@ -13,6 +13,10 @@ dependencies = [
     # Chunking
     "langchain-text-splitters>=0.3.0",
     "pypdf>=5.0.0",
+    # Embeddings
+    "google-genai>=1.0.0",
+    # Vector store
+    "chromadb>=0.6.0",
 ]
 
 [project.optional-dependencies]

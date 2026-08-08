@@ -26,8 +26,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         f"[{settings.app_env}]"
     )
 
+    # ── Connect vector store ───────────────────────────────────────────────────
+    from app.api.deps import get_vector_store_service
+
+    vector_store = get_vector_store_service()
+    try:
+        await vector_store.connect()
+    except Exception as exc:  # noqa: BLE001
+        # Log but don't crash — ChromaDB may start after the backend in Docker.
+        logger.warning(f"ChromaDB not reachable at startup | {exc}")
+
     yield  # application runs here
 
+    await vector_store.close()
     logger.info(f"Shutting down {settings.app_name}")
 
 

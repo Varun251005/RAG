@@ -37,6 +37,30 @@ class Settings(BaseSettings):
     gemini_model: str = "gemini-2.0-flash"
     gemini_embedding_model: str = "text-embedding-004"
 
+    # ── RAG pipeline ──────────────────────────────────────────────────────────
+    # Number of chunks retrieved from ChromaDB per query.
+    rag_top_k: int = 5
+    # Maximum tokens the LLM may produce in one answer.
+    rag_max_output_tokens: int = 2048
+    # Lower temperature → more factual / deterministic answers.
+    rag_temperature: float = 0.2
+    # Minimum similarity score to include a chunk (0–1, cosine).
+    rag_score_threshold: float = 0.0
+
+    # ── Embedding pipeline ────────────────────────────────────────────────────
+    # Chunks sent per Gemini API call (max 100 for text-embedding-004).
+    embedding_batch_size: int = 100
+    # Concurrent API calls in flight at once.
+    embedding_max_concurrent: int = 5
+    # Per-call retry attempts on transient errors.
+    embedding_max_retries: int = 3
+    # Exponential back-off base in seconds (full-jitter applied).
+    embedding_retry_base_secs: float = 1.0
+    # Directory for the L2 disk embedding cache.
+    embedding_cache_dir: str = ".embedding_cache"
+    # Maximum entries held in the L1 in-memory LRU cache.
+    embedding_cache_max_mem: int = 2048
+
     # ── PostgreSQL ─────────────────────────────────────────────────────────────
     database_url: str = "postgresql+asyncpg://voicerag:voicerag@localhost:5432/voicerag"
 
@@ -44,6 +68,8 @@ class Settings(BaseSettings):
     chroma_host: str = "localhost"
     chroma_port: int = 8001
     chroma_collection: str = "voicerag"
+    # Local persistent directory used when running without the Docker server.
+    chroma_persist_dir: str = ".chroma"
 
     # ── Edge-TTS ──────────────────────────────────────────────────────────────
     edge_tts_voice: str = "en-US-AriaNeural"

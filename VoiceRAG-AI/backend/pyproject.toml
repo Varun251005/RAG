@@ -17,6 +17,12 @@ dependencies = [
     "google-genai>=1.0.0",
     # Vector store
     "chromadb>=0.6.0",
+    # RAG — LangChain + Gemini chat LLM
+    "langchain>=0.3.0",
+    "langchain-core>=0.3.0",
+    "langchain-google-genai>=2.0.0",
+    # Text-to-Speech
+    "edge-tts>=6.1.0",
 ]
 
 [project.optional-dependencies]
@@ -24,6 +30,7 @@ dev = [
     "pytest>=8.3.0",
     "pytest-asyncio>=0.24.0",
     "httpx>=0.28.0",
+    "httpx-sse>=0.4.0",
     "ruff>=0.8.0",
     "mypy>=1.13.0",
 ]

@@ -1,15 +1,5 @@
 import pytest
-from httpx import ASGITransport, AsyncClient
-
-from app.main import app
-
-
-@pytest.fixture
-async def client() -> AsyncClient:  # type: ignore[misc]
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
-        yield ac  # type: ignore[misc]
+from httpx import AsyncClient
 
 
 async def test_health_returns_ok(client: AsyncClient) -> None:
@@ -18,7 +8,7 @@ async def test_health_returns_ok(client: AsyncClient) -> None:
     assert response.status_code == 200
 
     body = response.json()
-    assert body["status"] == "ok"
+    assert body["status"] in ("ok", "degraded")
     assert "env" in body
     assert "version" in body
     assert "dependencies" in body

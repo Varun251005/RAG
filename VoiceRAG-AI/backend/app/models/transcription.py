@@ -5,9 +5,21 @@ from __future__ import annotations
 from pydantic import BaseModel, ConfigDict, Field
 
 
+class VoiceTranscribeResponse(BaseModel):
+    """
+    Response schema for POST /api/v1/voice/transcribe.
+    """
+
+    text: str = Field(description="Transcribed natural-language text from audio.")
+    language: str = Field(description="Detected language code (e.g. 'en', 'es').")
+    duration: float = Field(ge=0.0, description="Audio duration in seconds.")
+
+    model_config = ConfigDict(frozen=True)
+
+
 class TranscriptionResponse(BaseModel):
     """
-    Successful audio transcription result returned by POST /api/v1/audio/transcribe.
+    Legacy audio transcription result returned by POST /api/v1/audio/transcribe.
     """
 
     text: str = Field(description="The transcribed natural-language text.")
@@ -18,9 +30,9 @@ class TranscriptionResponse(BaseModel):
     model_config = ConfigDict(frozen=True)
 
 
-class TranscriptionError(BaseModel):
-    """Error payload returned when audio transcription fails."""
+class TranscriptionErrorResponse(BaseModel):
+    """Error response schema."""
 
-    detail: str = Field(description="Error message detailing why transcription failed.")
+    detail: str = Field(description="Description of the transcription or validation error.")
 
     model_config = ConfigDict(frozen=True)

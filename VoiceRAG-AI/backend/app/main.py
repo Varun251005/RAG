@@ -72,11 +72,16 @@ def create_app() -> FastAPI:
     return app
 
 
-def _register_middleware(app: FastAPI, allowed_origins: list[str]) -> None:
+def _register_middleware(app: FastAPI, allowed_origins: list[str] | str) -> None:
     """Attach all middleware to the app instance."""
+    origins = (
+        [o.strip() for o in allowed_origins.split(",") if o.strip()]
+        if isinstance(allowed_origins, str)
+        else allowed_origins
+    )
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=allowed_origins,
+        allow_origins=origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

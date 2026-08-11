@@ -23,7 +23,23 @@ dependencies = [
     "langchain-google-genai>=2.0.0",
     # Text-to-Speech
     "edge-tts>=6.1.0",
+    "sentence-transformers>=5.7.0",
+    "faster-whisper>=1.2.1",
+    "rank-bm25>=0.2.2",
 ]
+
+# ---------------------------------------------------------------------------
+# uv — PyTorch CPU explicit index configuration
+# ---------------------------------------------------------------------------
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+torchvision = { index = "pytorch-cpu" }
+
 
 [project.optional-dependencies]
 dev = [

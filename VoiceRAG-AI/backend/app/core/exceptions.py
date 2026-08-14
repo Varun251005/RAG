@@ -15,7 +15,11 @@ class AppException(Exception):
         self.status_code = status_code
         self.message = message
         self.detail = detail
-        super().__init__(message)
+        super().__init__(detail or message)
+
+    def __str__(self) -> str:
+        return self.detail or self.message
+
 
 
 class NotFoundError(AppException):

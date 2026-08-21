@@ -89,3 +89,28 @@ async def test_delete_document(client: AsyncClient, sample_pdf: bytes) -> None:
 async def test_delete_nonexistent_returns_404(client: AsyncClient) -> None:
     response = await client.delete("/api/v1/documents/nonexistent-id")
     assert response.status_code == 404
+
+
+async def test_get_document_file_success(client: AsyncClient, sample_pdf: bytes) -> None:
+    upload = await client.post(
+        "/api/v1/documents/upload",
+        files={"file": ("file_test.pdf", sample_pdf, "application/pdf")},
+    )
+    doc_id = upload.json()["document_id"]
+
+    response = await client.get(f"/api/v1/documents/{doc_id}/file")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/pdf"
+    assert response.content == sample_pdf
+
+
+async def test_get_document_file_nonexistent_returns_404(client: AsyncClient) -> None:
+    response = await client.get("/api/v1/documents/nonexistent-doc-id/file")
+    assert response.status_code == 404
+    assert response.headers["content-type"] == "application/json"
+
+
+async def test_get_document_file_path_traversal_returns_404(client: AsyncClient) -> None:
+    response = await client.get("/api/v1/documents/..%2F..%2Fetc%2Fpasswd/file")
+    assert response.status_code == 404
+

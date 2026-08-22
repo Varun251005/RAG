@@ -49,7 +49,14 @@ export async function fetchDocumentDetails(
   return response.data;
 }
 
+/** Get full absolute API URL for retrieving original PDF file binary. */
+export function getDocumentFileUrl(documentId: string): string {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+  return `${baseUrl}${BASE}/${documentId}/file`;
+}
+
 /** Permanently delete document chunks from DELETE /api/v1/documents/{documentId}. */
 export async function deleteDocument(documentId: string): Promise<void> {
   await apiClient.delete(`${BASE}/${documentId}`);
 }
+

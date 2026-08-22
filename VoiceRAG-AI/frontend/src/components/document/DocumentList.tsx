@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Loader2,
   RefreshCw,
+  Eye,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { deleteDocument, fetchDocuments } from "@/lib/api/documents";
 import { useDocumentStore } from "@/store/documentStore";
+import { PdfViewerModal } from "@/components/pdf/PdfViewerModal";
 import type { DocumentInfoResponse } from "@/types/document";
 
 export function DocumentList() {
@@ -33,6 +35,7 @@ export function DocumentList() {
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmDeleteDoc, setConfirmDeleteDoc] = useState<DocumentInfoResponse | null>(null);
+  const [viewingDoc, setViewingDoc] = useState<DocumentInfoResponse | null>(null);
 
   const handleRefresh = useCallback(async () => {
     setLoading(true);
@@ -145,7 +148,14 @@ export function DocumentList() {
 
                 <div className="min-w-0 space-y-0.5">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="truncate text-sm font-semibold text-zinc-900">{doc.filename}</p>
+                    <button
+                      type="button"
+                      onClick={() => setViewingDoc(doc)}
+                      className="truncate text-sm font-semibold text-zinc-900 hover:underline text-left"
+                      title="Click to view PDF"
+                    >
+                      {doc.filename}
+                    </button>
                     <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-zinc-100 border border-zinc-200 text-zinc-600 shrink-0 flex items-center gap-1">
                       <Database className="w-2.5 h-2.5" />
                       384-dim Chunks ({doc.total_chunks})
@@ -158,10 +168,17 @@ export function DocumentList() {
               </div>
 
               <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                {/* Ready Status Badge */}
-                <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Ready
-                </span>
+                {/* View PDF Button */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setViewingDoc(doc)}
+                  className="text-xs h-8 px-3 gap-1.5 rounded-xl font-medium bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-100"
+                  title="Open PDF viewer"
+                >
+                  <Eye className="w-3.5 h-3.5 text-zinc-600" />
+                  <span>View PDF</span>
+                </Button>
 
                 {/* Filter for chat selection toggle */}
                 <Button
@@ -232,7 +249,19 @@ export function DocumentList() {
           </div>
         </div>
       )}
+
+      {/* PDF Viewer Modal */}
+      {viewingDoc && (
+        <PdfViewerModal
+          isOpen={!!viewingDoc}
+          onClose={() => setViewingDoc(null)}
+          documentId={viewingDoc.document_id}
+          documentName={viewingDoc.filename}
+          initialPage={1}
+        />
+      )}
     </>
   );
 }
+
 

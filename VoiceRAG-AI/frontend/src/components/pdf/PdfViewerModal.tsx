@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   X,
   ChevronLeft,
@@ -12,11 +12,13 @@ import {
   FileText,
   Sparkles,
   Download,
+  Loader2,
+  AlertCircle,
+  RotateCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+import { fetchDocumentDetails, getDocumentFileUrl } from "@/lib/api/documents";
 
 interface PdfViewerModalProps {
   isOpen: boolean;
@@ -36,28 +38,63 @@ export function PdfViewerModal({
   highlightSnippet,
 }: PdfViewerModalProps) {
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [numPages] = useState(20); // Default estimate for sidebar navigation
+  const [numPages, setNumPages] = useState<number>(20);
   const [zoom, setZoom] = useState(1.0);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const checkAndFetchDocument = useCallback(async () => {
+    if (!documentId) return;
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // 1. Fetch document metadata to get total pages if available
+      const details = await fetchDocumentDetails(documentId).catch(() => null);
+      if (details?.total_pages && details.total_pages > 0) {
+        setNumPages(details.total_pages);
+      } else {
+        setNumPages(Math.max(20, initialPage));
+      }
+
+      // 2. Perform request to verify original PDF file availability
+      const fileUrl = getDocumentFileUrl(documentId);
+      const res = await fetch(fileUrl);
+
+      if (res.status === 404) {
+        setError("Document file not found on server. This document may have been indexed before file saving was enabled. Please re-upload this document.");
+      } else if (!res.ok) {
+        setError("Unable to load this document.");
+      } else {
+        setError(null);
+      }
+    } catch (err) {
+      setError("Unable to load this document.");
+    } finally {
+      setIsLoading(false);
+    }
+  }, [documentId, initialPage]);
+
 
   useEffect(() => {
-    if (initialPage) {
-      setCurrentPage(initialPage);
+    if (isOpen && documentId) {
+      setCurrentPage(initialPage || 1);
+      checkAndFetchDocument();
     }
-  }, [initialPage, documentId]);
+  }, [isOpen, documentId, initialPage, checkAndFetchDocument]);
 
   if (!isOpen || !documentId) return null;
 
-  const pdfFileUrl = `${API_BASE_URL}/api/v1/documents/${documentId}/file#page=${currentPage}&zoom=${Math.round(
-    zoom * 100
-  )}`;
+  const rawFileUrl = getDocumentFileUrl(documentId);
+  const pdfFileUrl = `${rawFileUrl}#page=${currentPage}&zoom=${Math.round(zoom * 100)}`;
 
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(1, prev - 1));
   };
 
   const handleNextPage = () => {
-    setCurrentPage((prev) => prev + 1);
+    setCurrentPage((prev) => Math.min(numPages, prev + 1));
   };
 
   const handleZoomIn = () => {
@@ -103,7 +140,7 @@ export function PdfViewerModal({
               variant="ghost"
               size="icon"
               onClick={handlePrevPage}
-              disabled={currentPage <= 1}
+              disabled={currentPage <= 1 || isLoading || !!error}
               className="h-7 w-7 text-slate-300 hover:text-white disabled:opacity-30"
               title="Previous Page"
             >
@@ -115,17 +152,24 @@ export function PdfViewerModal({
               <input
                 type="number"
                 min={1}
+                max={numPages}
+                disabled={isLoading || !!error}
                 value={currentPage}
-                onChange={(e) => setCurrentPage(Math.max(1, parseInt(e.target.value) || 1))}
-                className="w-8 bg-transparent text-center text-white focus:outline-none focus:ring-1 focus:ring-primary rounded"
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 1;
+                  setCurrentPage(Math.min(numPages, Math.max(1, val)));
+                }}
+                className="w-8 bg-transparent text-center text-white focus:outline-none focus:ring-1 focus:ring-primary rounded disabled:opacity-50"
               />
+              <span className="text-slate-400">/ {numPages}</span>
             </div>
 
             <Button
               variant="ghost"
               size="icon"
               onClick={handleNextPage}
-              className="h-7 w-7 text-slate-300 hover:text-white"
+              disabled={currentPage >= numPages || isLoading || !!error}
+              className="h-7 w-7 text-slate-300 hover:text-white disabled:opacity-30"
               title="Next Page"
             >
               <ChevronRight className="w-4 h-4" />
@@ -139,7 +183,8 @@ export function PdfViewerModal({
                 variant="ghost"
                 size="icon"
                 onClick={handleZoomOut}
-                className="h-7 w-7 text-slate-300 hover:text-white"
+                disabled={isLoading || !!error}
+                className="h-7 w-7 text-slate-300 hover:text-white disabled:opacity-30"
                 title="Zoom Out"
               >
                 <ZoomOut className="w-3.5 h-3.5" />
@@ -153,7 +198,8 @@ export function PdfViewerModal({
                 variant="ghost"
                 size="icon"
                 onClick={handleZoomIn}
-                className="h-7 w-7 text-slate-300 hover:text-white"
+                disabled={isLoading || !!error}
+                className="h-7 w-7 text-slate-300 hover:text-white disabled:opacity-30"
                 title="Zoom In"
               >
                 <ZoomIn className="w-3.5 h-3.5" />
@@ -163,23 +209,26 @@ export function PdfViewerModal({
                 variant="ghost"
                 size="icon"
                 onClick={handleFitWidth}
-                className="h-7 w-7 text-slate-300 hover:text-white"
+                disabled={isLoading || !!error}
+                className="h-7 w-7 text-slate-300 hover:text-white disabled:opacity-30"
                 title="Reset Zoom / Fit Width"
               >
                 <Maximize2 className="w-3.5 h-3.5" />
               </Button>
             </div>
 
-            <a href={`${API_BASE_URL}/api/v1/documents/${documentId}/file`} download={documentName}>
+            <a href={rawFileUrl} download={documentName}>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8 text-slate-300 hover:text-white hover:bg-slate-800"
+                disabled={isLoading || !!error}
+                className="h-8 w-8 text-slate-300 hover:text-white hover:bg-slate-800 disabled:opacity-30"
                 title="Download PDF"
               >
                 <Download className="w-4 h-4" />
               </Button>
             </a>
+
 
             <Button
               variant="ghost"
@@ -202,7 +251,7 @@ export function PdfViewerModal({
                 Pages Navigation
               </span>
               <div className="space-y-1.5">
-                {Array.from({ length: Math.min(15, numPages) }).map((_, idx) => {
+                {Array.from({ length: numPages }).map((_, idx) => {
                   const pageNum = idx + 1;
                   const isActive = currentPage === pageNum;
                   return (
@@ -210,11 +259,12 @@ export function PdfViewerModal({
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
                       type="button"
+                      disabled={isLoading || !!error}
                       className={`w-full flex items-center justify-between p-2 rounded-lg text-xs font-medium transition-all ${
                         isActive
                           ? "bg-primary text-primary-foreground font-bold shadow-md"
                           : "bg-slate-800/60 text-slate-300 hover:bg-slate-800 hover:text-white"
-                      }`}
+                      } disabled:opacity-50`}
                     >
                       <div className="flex items-center gap-2">
                         <FileText className="w-3.5 h-3.5 shrink-0" />
@@ -233,7 +283,7 @@ export function PdfViewerModal({
           {/* Main PDF Canvas/Embed Container */}
           <main className="flex-1 flex flex-col relative overflow-hidden bg-slate-950">
             {/* Highlighted Source Citation Banner */}
-            {highlightSnippet && (
+            {highlightSnippet && !isLoading && !error && (
               <div className="p-3 bg-amber-500/10 border-b border-amber-500/30 text-amber-200 text-xs flex items-start gap-2 shrink-0 animate-in fade-in">
                 <Sparkles className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                 <div className="space-y-0.5 overflow-hidden">
@@ -245,15 +295,55 @@ export function PdfViewerModal({
               </div>
             )}
 
-            {/* PDF Render Engine iframe */}
-            <div className="flex-1 w-full h-full relative">
-              <iframe
-                key={`${documentId}-${currentPage}-${zoom}`}
-                src={pdfFileUrl}
-                className="w-full h-full border-0"
-                title={documentName}
-              />
-            </div>
+            {/* Loading State */}
+            {isLoading && (
+              <div className="flex-1 flex flex-col items-center justify-center gap-3 text-slate-400">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                <p className="text-sm font-medium">Loading document...</p>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && !isLoading && (
+              <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center p-6">
+                <AlertCircle className="w-12 h-12 text-rose-500" />
+                <div className="space-y-1">
+                  <h3 className="text-base font-bold text-slate-100">Unable to Load PDF</h3>
+                  <p className="text-xs text-slate-400 max-w-sm">{error}</p>
+                </div>
+                <div className="flex items-center gap-3 mt-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={checkAndFetchDocument}
+                    className="bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700 text-xs font-semibold rounded-xl"
+                  >
+                    <RotateCw className="w-3.5 h-3.5 mr-1.5" />
+                    Retry
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={onClose}
+                    className="text-slate-400 hover:text-white text-xs font-semibold rounded-xl"
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* PDF Render Engine iframe / object */}
+            {!isLoading && !error && (
+              <div className="flex-1 w-full h-full relative">
+                <iframe
+                  key={`${documentId}-${currentPage}-${zoom}`}
+                  src={pdfFileUrl}
+                  className="w-full h-full border-0"
+                  title={documentName}
+                />
+              </div>
+            )}
           </main>
         </div>
       </div>

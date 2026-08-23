@@ -66,7 +66,14 @@ class DocumentIngestionService:
         logger.info(f"Starting PDF ingestion | document_id={doc_id} | filename={filename}")
 
         try:
-            # 1. Page-by-page PDF extraction
+            # 1. Save original PDF file for browser PDF viewer
+            self.pdf_service.save_pdf(
+                content=pdf_bytes,
+                filename=filename,
+                doc_id=doc_id,
+            )
+
+            # 2. Page-by-page PDF extraction
             pdf_data = self.pdf_service.extract_text_from_bytes(
                 content=pdf_bytes,
                 filename=filename,
@@ -75,7 +82,7 @@ class DocumentIngestionService:
             pages = pdf_data["pages"]
             total_pages = pdf_data["total_pages"]
 
-            # 2. Text Chunking across extracted pages
+            # 3. Text Chunking across extracted pages
             raw_chunks: list[dict[str, Any]] = []
             global_chunk_idx = 0
 
@@ -103,14 +110,14 @@ class DocumentIngestionService:
             if not raw_chunks:
                 raise UnprocessableError(f"No text chunks could be generated for document '{filename}'.")
 
-            # 3. Batch CPU Embeddings (all-MiniLM-L6-v2, 384-dim)
+            # 4. Batch CPU Embeddings (all-MiniLM-L6-v2, 384-dim)
             chunk_texts = [c["text"] for c in raw_chunks]
             embeddings = self.embedding_service.embed_batch(chunk_texts)
 
             if len(embeddings) != len(raw_chunks):
                 raise ServiceError("Mismatch between generated embeddings count and chunks count.")
 
-            # 4. Construct VectorDocuments
+            # 5. Construct VectorDocuments
             vector_docs: list[VectorDocument] = []
             for idx, c in enumerate(raw_chunks):
                 v_doc = VectorDocument(
@@ -126,7 +133,7 @@ class DocumentIngestionService:
                 )
                 vector_docs.append(v_doc)
 
-            # 5. ChromaDB Vector Upsert & BM25 Keyword Indexing
+            # 6. ChromaDB Vector Upsert & BM25 Keyword Indexing
             await self.vector_store_service.upsert_documents(
                 documents=vector_docs,
                 collection_name=collection_name,
@@ -168,6 +175,14 @@ class DocumentIngestionService:
                     collection_name=collection_name,
                 )
                 self.bm25_service.delete_document(document_id=doc_id)
+                # Cleanup saved PDF file if present
+                doc_dir = self.pdf_service.storage_dir / doc_id
+                if doc_dir.exists():
+                    if doc_dir.is_dir():
+                        import shutil
+                        shutil.rmtree(doc_dir, ignore_errors=True)
+                    elif doc_dir.is_file():
+                        doc_dir.unlink(missing_ok=True)
                 logger.info(f"Rollback cleanup succeeded for document_id={doc_id}")
             except Exception as cleanup_exc:
                 logger.warning(f"Rollback cleanup warning for document_id={doc_id}: {cleanup_exc}")

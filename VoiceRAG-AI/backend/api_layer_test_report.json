@@ -1,0 +1,63 @@
+{
+  "upload": {
+    "status_code": 201,
+    "response": {
+      "document_id": "doc_05a3a52c0ec1",
+      "filename": "python_intro.pdf",
+      "total_pages": 1,
+      "total_chunks": 1,
+      "status": "completed"
+    }
+  },
+  "invalid_upload": {
+    "status_code": 422
+  },
+  "list": {
+    "status_code": 200,
+    "response": {
+      "documents": [
+        {
+          "document_id": "doc_05a3a52c0ec1",
+          "filename": "python_intro.pdf",
+          "total_chunks": 1
+        }
+      ],
+      "total": 1
+    }
+  },
+  "get": {
+    "status_code": 200,
+    "response": {
+      "document_id": "doc_05a3a52c0ec1",
+      "filename": "python_intro.pdf",
+      "total_chunks": 1
+    }
+  },
+  "nonexistent": {
+    "status_code": 404
+  },
+  "chat": {
+    "status_code": 200,
+    "response": {
+      "answer": "Python is an interpreted high-level general-purpose programming language.",
+      "sources": [
+        {
+          "document_id": "doc_05a3a52c0ec1",
+          "filename": "python_intro.pdf",
+          "page_number": 1,
+          "chunk_id": "doc_05a3a52c0ec1_p0001_c0000"
+        }
+      ]
+    }
+  },
+  "empty_chat": {
+    "status_code": 422
+  },
+  "delete": {
+    "status_code": 200,
+    "response": {
+      "message": "Document 'doc_05a3a52c0ec1' deleted successfully.",
+      "document_id": "doc_05a3a52c0ec1"
+    }
+  }
+}

@@ -1,0 +1,51 @@
+PYTEST CODE: 0
+TOTAL TIME: 13.61s
+
+OUTPUT:
+============================= test session starts ==============================
+platform linux -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/jod/ragAI/VoiceRAG-AI/backend
+configfile: pyproject.toml
+plugins: langsmith-0.10.16, anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 8 items
+
+tests/test_stt_voice.py::test_stt_model_loading_and_cpu_config PASSED    [ 12%]
+tests/test_stt_voice.py::test_stt_valid_audio_transcription_and_language PASSED [ 25%]
+tests/test_stt_voice.py::test_stt_empty_audio_validation PASSED          [ 37%]
+tests/test_stt_voice.py::test_stt_unsupported_format PASSED              [ 50%]
+tests/test_stt_voice.py::test_stt_temporary_file_cleanup PASSED          [ 62%]
+tests/test_stt_voice.py::test_api_voice_transcribe_success PASSED        [ 75%]
+tests/test_stt_voice.py::test_api_voice_transcribe_empty_file PASSED     [ 87%]
+tests/test_stt_voice.py::test_api_voice_transcribe_unsupported_format PASSED [100%]
+
+=============================== warnings summary ===============================
+../../../.local/lib/python3.14/site-packages/google/__init__.py:16
+  /home/jod/.local/lib/python3.14/site-packages/google/__init__.py:16: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+    import pkg_resources
+
+../../../.local/lib/python3.14/site-packages/pkg_resources/__init__.py:3147
+  /home/jod/.local/lib/python3.14/site-packages/pkg_resources/__init__.py:3147: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('paste')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    declare_namespace(pkg)
+
+../../../.local/lib/python3.14/site-packages/google/__init__.py:18
+  /home/jod/.local/lib/python3.14/site-packages/google/__init__.py:18: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    pkg_resources.declare_namespace(__name__)
+
+../../../.local/lib/python3.14/site-packages/google/genai/types.py:42
+  /home/jod/.local/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+../../../.local/lib/python3.14/site-packages/chromadb/telemetry/opentelemetry/__init__.py:128
+  /home/jod/.local/lib/python3.14/site-packages/chromadb/telemetry/opentelemetry/__init__.py:128: DeprecationWarning: 'asyncio.iscoroutinefunction' is deprecated and slated for removal in Python 3.16; use inspect.iscoroutinefunction() instead
+    if asyncio.iscoroutinefunction(f):
+
+tests/test_stt_voice.py::test_api_voice_transcribe_empty_file
+  /home/jod/.local/lib/python3.14/site-packages/fastapi/routing.py:352: StarletteDeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    return await dependant.call(**values)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 8 passed, 6 warnings in 11.66s ========================

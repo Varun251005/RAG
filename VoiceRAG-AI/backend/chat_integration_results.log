@@ -1,0 +1,43 @@
+PYTEST CODE: 0
+
+OUTPUT:
+============================= test session starts ==============================
+platform linux -- Python 3.14.6, pytest-9.1.1, pluggy-1.6.0 -- /usr/bin/python3
+cachedir: .pytest_cache
+rootdir: /home/jod/ragAI/VoiceRAG-AI/backend
+configfile: pyproject.toml
+plugins: langsmith-0.10.16, anyio-4.14.2, asyncio-1.4.0
+asyncio: mode=Mode.AUTO, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+collecting ... collected 5 items
+
+tests/test_frontend_chat_integration.py::test_1_upload_and_chat_query PASSED [ 20%]
+tests/test_frontend_chat_integration.py::test_2_filter_by_document_id PASSED [ 40%]
+tests/test_frontend_chat_integration.py::test_3_clear_document_filter PASSED [ 60%]
+tests/test_frontend_chat_integration.py::test_4_unanswerable_question PASSED [ 80%]
+tests/test_frontend_chat_integration.py::test_5_empty_input_validation PASSED [100%]
+
+=============================== warnings summary ===============================
+../../../.local/lib/python3.14/site-packages/google/__init__.py:16
+  /home/jod/.local/lib/python3.14/site-packages/google/__init__.py:16: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+    import pkg_resources
+
+../../../../../usr/lib/python3.14/site-packages/pkg_resources/__init__.py:3148
+  /usr/lib/python3.14/site-packages/pkg_resources/__init__.py:3148: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('paste')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    declare_namespace(pkg)
+
+../../../.local/lib/python3.14/site-packages/google/__init__.py:18
+  /home/jod/.local/lib/python3.14/site-packages/google/__init__.py:18: DeprecationWarning: Deprecated call to `pkg_resources.declare_namespace('google')`.
+  Implementing implicit namespace packages (as specified in PEP 420) is preferred to `pkg_resources.declare_namespace`. See https://setuptools.pypa.io/en/latest/references/keywords.html#keyword-namespace-packages
+    pkg_resources.declare_namespace(__name__)
+
+../../../.local/lib/python3.14/site-packages/google/genai/types.py:42
+  /home/jod/.local/lib/python3.14/site-packages/google/genai/types.py:42: DeprecationWarning: '_UnionGenericAlias' is deprecated and slated for removal in Python 3.17
+    VersionedUnionType = Union[builtin_types.UnionType, _UnionGenericAlias]
+
+../../../.local/lib/python3.14/site-packages/chromadb/telemetry/opentelemetry/__init__.py:128
+  /home/jod/.local/lib/python3.14/site-packages/chromadb/telemetry/opentelemetry/__init__.py:128: DeprecationWarning: 'asyncio.iscoroutinefunction' is deprecated and slated for removal in Python 3.16; use inspect.iscoroutinefunction() instead
+    if asyncio.iscoroutinefunction(f):
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================== 5 passed, 5 warnings in 16.61s ========================

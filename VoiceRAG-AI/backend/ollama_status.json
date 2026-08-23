@@ -1,0 +1,79 @@
+{
+  "version": "ollama version is 0.30.5",
+  "models_cli": "NAME              ID              SIZE      MODIFIED     \nqwen2.5:0.5b      a8b0c5157701    397 MB    4 weeks ago     \nqwen2.5:7b        845dbda0ea48    4.7 GB    4 weeks ago     \nqwen3.5:latest    6488c96fa5fa    6.6 GB    2 months ago    ",
+  "models_http": {
+    "models": [
+      {
+        "name": "qwen2.5:0.5b",
+        "model": "qwen2.5:0.5b",
+        "modified_at": "2026-07-17T12:11:25.479119947+05:30",
+        "size": 397821319,
+        "digest": "a8b0c51577010a279d933d14c2a8ab4b268079d44c5c8830c0a93900f1827c67",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen2",
+          "families": [
+            "qwen2"
+          ],
+          "parameter_size": "494.03M",
+          "quantization_level": "Q4_K_M",
+          "context_length": 32768,
+          "embedding_length": 896
+        },
+        "capabilities": [
+          "completion",
+          "tools"
+        ]
+      },
+      {
+        "name": "qwen2.5:7b",
+        "model": "qwen2.5:7b",
+        "modified_at": "2026-07-17T12:06:59.391725924+05:30",
+        "size": 4683087332,
+        "digest": "845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen2",
+          "families": [
+            "qwen2"
+          ],
+          "parameter_size": "7.6B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 32768,
+          "embedding_length": 3584
+        },
+        "capabilities": [
+          "completion",
+          "tools"
+        ]
+      },
+      {
+        "name": "qwen3.5:latest",
+        "model": "qwen3.5:latest",
+        "modified_at": "2026-06-06T16:28:02.738918949+05:30",
+        "size": 6594474711,
+        "digest": "6488c96fa5faab64bb65cbd30d4289e20e6130ef535a93ef9a49f42eda893ea7",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen35",
+          "families": [
+            "qwen35"
+          ],
+          "parameter_size": "9.7B",
+          "quantization_level": "Q4_K_M",
+          "context_length": 262144,
+          "embedding_length": 4096
+        },
+        "capabilities": [
+          "vision",
+          "completion",
+          "tools",
+          "thinking"
+        ]
+      }
+    ]
+  }
+}

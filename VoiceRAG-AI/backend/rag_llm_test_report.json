@@ -1,0 +1,27 @@
+{
+  "test_1_in_context": {
+    "question": "What is Python used for?",
+    "answer": "Python is commonly used for software development and artificial intelligence.",
+    "sources": [
+      {
+        "document_id": "doc_py_1",
+        "filename": "python_guide.pdf",
+        "page_number": 1,
+        "chunk_id": "chunk_0"
+      },
+      {
+        "document_id": "doc_api_3",
+        "filename": "fastapi_manual.pdf",
+        "page_number": 3,
+        "chunk_id": "chunk_2"
+      }
+    ],
+    "latency_ms": 839.9721280002268,
+    "total_elapsed_ms": 12224.270726999748
+  },
+  "test_2_out_of_context": {
+    "question": "What is the capital of France?",
+    "answer": "The requested information is not available in the provided documents.",
+    "sources": []
+  }
+}

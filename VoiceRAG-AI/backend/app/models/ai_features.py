@@ -1,4 +1,4 @@
-"""Pydantic models for Document AI Features (Summary, Flashcards, Quiz, Notes, Key Topics, FAQ)."""
++"""Pydantic models for Document AI Features (Summary, Flashcards, Quiz, Notes, Key Topics, FAQ)."""
 
 from __future__ import annotations
 

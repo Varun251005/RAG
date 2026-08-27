@@ -21,7 +21,7 @@
   --input: #e4e4e7;
   --ring: #18181b;
   --radius: 0.75rem;
-  --font-jetbrains-mono: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace;
+  --font-roboto-mono: var(--font-roboto-mono), 'Roboto Mono', ui-monospace, monospace;
 }
 
 @theme inline {
@@ -42,23 +42,23 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --font-sans: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace;
-  --font-mono: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace;
-  --font-pixel: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: var(--font-roboto-mono), 'Roboto Mono', ui-monospace, monospace;
+  --font-mono: var(--font-roboto-mono), 'Roboto Mono', ui-monospace, monospace;
+  --font-pixel: var(--font-roboto-mono), 'Roboto Mono', ui-monospace, monospace;
 }
 
 *, ::before, ::after {
-  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace !important;
+  font-family: var(--font-roboto-mono), 'Roboto Mono', ui-monospace, monospace !important;
 }
 
 h1, h2, h3, h4, h5, h6, .font-pixel, .font-heading {
-  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace !important;
+  font-family: var(--font-roboto-mono), 'Roboto Mono', ui-monospace, monospace !important;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', ui-monospace, monospace !important;
+  font-family: var(--font-roboto-mono), 'Roboto Mono', ui-monospace, monospace !important;
   -webkit-font-smoothing: antialiased;
 }
 
